@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diseño de camiseta</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e3f6f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h2 {
+      color: #00bcd4;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .camiseta-container {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    svg {
+      width: 250px;
+      height: auto;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    input[type="color"] {
+      width: 60px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #ffc99b;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ffb077;
+    }
+  </style>
+</head>
+<body>
+  <h2>Diseña tu Camiseta</h2>
+
+  <div class="camiseta-container">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 15" id="camiseta-svg">
+      <path class="parte-camiseta" id="manga-izquierda" d="M 5 3 L 5 6 L 3 7 L 1 5" fill="#000000"/>
+      <path class="parte-camiseta" id="torso" d="M 9 5 L 7 3 L 5 3 L 5 6 L 5 12 L 13 12 L 13 6 L 13 3 L 11 3" fill="#000000"/>
+      <path class="parte-camiseta" id="manga-derecha" d="M 13 6 L 13 3 L 17 5 L 15 7" fill="#000000"/>
+      <path class="parte-camiseta" id="cuelloizq" d="M 8 2 L 7 3 L 9 5 L 8 3" fill="#000000"/>
+      <path class="parte-camiseta" id="cuelloder" d="M 10 2 L 11 3 L 9 5 L 10 3" fill="#000000"/>
+    </svg>
+  </div>
+
+  <div class="controls">
+    <input type="color" id="color-picker" value="#ffffff"/>
+    <button id="btn-guardar">Guardar Diseño</button>
+    <button id="btn-limpiar">Reiniciar Colores</button>
+  </div>
+
+  <script>
+    const svg = document.getElementById('camiseta-svg');
+    const colorPicker = document.getElementById('color-picker');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+    let parteSeleccionada = null;
+
+    svg.addEventListener('click', (event) => {
+      if (event.target.classList.contains('parte-camiseta')) {
+        parteSeleccionada = event.target;
+        const colorActual = parteSeleccionada.getAttribute('fill');
+        colorPicker.value = colorActual;
+        console.log('Parte seleccionada:', parteSeleccionada.id);
+      }
+    });
+
+    colorPicker.addEventListener('input', (event) => {
+      if (parteSeleccionada) {
+        parteSeleccionada.setAttribute('fill', event.target.value);
+      }
+    });
+
+    btnLimpiar.addEventListener('click', () => {
+      document.querySelectorAll('.parte-camiseta').forEach(el => {
+        el.setAttribute('fill', '#ffffff');
+      });
+    });
+
+    btnGuardar.addEventListener('click', async () => {
+      const diseño = {
+        torso: document.getElementById('torso').getAttribute('fill'),
+        mangaIzqColor: document.getElementById('manga-izquierda').getAttribute('fill'),
+        mangaDerColor: document.getElementById('manga-derecha').getAttribute('fill'),
+        cuelloDerColor: document.getElementById('cuelloder').getAttribute('fill'),
+        cuelloIzqColor: document.getElementById('cuelloizq').getAttribute('fill')
+      };
+
+      try {
+        const resp = await fetch('/api/camisetas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          body: JSON.stringify(diseño)
+        });
+
+        const data = await resp.json();
+        console.log('Diseño guardado en servidor:', data);
+        alert("Diseño guardado exitosamente.");
+      } catch (err) {
+        console.error("Error al guardar:", err);
+        alert("Error al guardar el diseño. Revisa el token o la conexión.");
+      }
+    });
+  </script>
+</body>
+</html>

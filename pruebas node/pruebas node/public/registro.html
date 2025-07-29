@@ -1,0 +1,94 @@
+<html>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e3f6f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #00bcd4;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #ffc99b;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #00bcd4;
+            background-color: #f0faff;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            background-color: #ffc99b;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="button"]:hover {
+            background-color: #ffb077;
+        }
+    </style>
+    <head>
+        <title>Registro de nuevos usuarios</title>
+    </head>
+
+    <body>
+        <input type="text" id="txt_nombre" placeholder="Escriba el nombre">
+        <input type="email" id="txt_email" placeholder="Escriba el correo">
+        <input type="password" id="txt_clave" placeholder="Escriba la contraseña">
+
+        <input type="button" value="Registrarse" onclick="registro()">
+        <script type="text/javascript">
+            function registro(){
+                nombreinput = document.getElementById("txt_nombre").value;
+                emailinput = document.getElementById("txt_email").value;
+                passinput = document.getElementById("txt_clave").value;
+                fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre: nombreinput, email: emailinput, clave: passinput })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Usuario creado:', data);
+                        alert("Usuario creado");
+                    });
+
+            }
+        </script>
+    </body>
+</html>

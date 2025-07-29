@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de nuevos usuarios</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e3f6f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 50px 40px;
+      border-radius: 18px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      width: 450px; /* Aumentado */
+      max-width: 90vw;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      color: #00bcd4;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .form-container input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 22px;
+      border: 2px solid #ffc99b;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .form-container input:focus {
+      border-color: #00bcd4;
+      background-color: #f0faff;
+      outline: none;
+    }
+
+    .form-container input[type="button"] {
+      background-color: #ffc99b;
+      border: none;
+      font-weight: bold;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .form-container input[type="button"]:hover {
+      background-color: #ffb077;
+    }
+
+    #mensaje {
+      text-align: center;
+      color: #4caf50;
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Registro</h2>
+    <input type="text" id="txt_nombre" placeholder="Escriba el nombre">
+    <input type="email" id="txt_email" placeholder="Escriba el correo">
+    <input type="password" id="txt_clave" placeholder="Escriba la contraseña">
+    <input type="button" value="Registrarse" onclick="registro()">
+    <p id="mensaje"></p>
+  </div>
+
+  <script>
+    function registro() {
+      const nombre = document.getElementById("txt_nombre").value;
+      const email = document.getElementById("txt_email").value;
+      const clave = document.getElementById("txt_clave").value;
+
+      fetch('/api/usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, clave })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('mensaje').innerText = '¡Usuario creado exitosamente!';
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        document.getElementById('mensaje').innerText = 'Error al registrar.';
+      });
+    }
+
+    // Navegación por Enter
+    const campos = ["txt_nombre", "txt_email", "txt_clave"];
+    campos.forEach((id, index) => {
+      const input = document.getElementById(id);
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (index < campos.length - 1) {
+            document.getElementById(campos[index + 1]).focus();
+          } else {
+            registro();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
